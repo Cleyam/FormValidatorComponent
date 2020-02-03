@@ -119,10 +119,16 @@ This method will add a contextual error message in the $errors array if the set 
 `pattern` - You can use one of the following predefined patterns : email, phone, text, url, uri.
 
 
-* #### predefinedPattern
+* #### customPattern
 This method will add a contextual error message in the $errors array if the set value doesn't match the custom regex pattern set as a parameter.
 
 `pattern` - You'll have to set an regex string as a parameter, without delimiters.
+
+
+* #### validDate
+This method will add a contextual error message in the $errors array if the set value isn't a date with the right format.
+
+`format` - dd/mm/yyyy by default. You can use another date format regex as a parameter, without delimiters.
 
 
 * #### required

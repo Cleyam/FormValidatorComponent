@@ -248,6 +248,21 @@ class FormValidator
     }
 
     /**
+     * Add error message if the value previously set isn't a date with the right format, said format being dd/mm/yyyy by default.
+     *
+     * @param string $format
+     * @return self
+     */
+    public function validDate($format = '^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$'): self
+    {
+        $regex = '/' . $format . '/u';
+        if (!preg_match($regex, $this->value)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' date format is invalid.';
+        }
+        return $this;
+    }
+
+    /**
      * Add error message if the field isn't set.
      *
      * @return self
