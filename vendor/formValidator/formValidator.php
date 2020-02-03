@@ -8,7 +8,7 @@ class FormValidator
     protected $value;
     protected $file;
     protected $patterns = [
-        'email' => "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+        'email' => "^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$",
 
         'phone' => '^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$',
 
@@ -18,44 +18,68 @@ class FormValidator
 
         'uri' => "\w+:(\/?\/?)[^\s]+",
     ];
-    protected $errors = '';
-
+    protected $errors = [];
 
     /**
-     * Return the name of the field to test.
-     *
-     * @param string $name
-     * @return self
+     * Get the value of name
      */
-    public function name(string $name): self
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the value of name
+     *
+     * @return  self
+     */
+    public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
-     * Return the value of the field to test.
-     *
-     * @param [type] $value
-     * @return self
+     * Get the value of value
      */
-    public function value($value): self
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Set the value of value
+     *
+     * @return  self
+     */
+    public function setValue($value)
     {
         $this->value = $value;
+
         return $this;
     }
 
     /**
-     * Return the file to test.
-     *
-     * @param [type] $file
-     * @return self
+     * Get the value of file
      */
-    public function file($file): self
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set the value of file
+     *
+     * @return  self
+     */
+    public function setFile($file)
     {
         $this->file = $file;
+
         return $this;
     }
+
 
     /**
      * Return true if the value passed all the tests without getting errors, and false if there has been errors.
@@ -64,54 +88,80 @@ class FormValidator
      */
     public function isValid(): bool
     {
-        if (empty($this->errors)) {
-            return true;
-        } else {
-            return false;
-        }
+        return empty($this->errors);
     }
 
     /**
-     * Return true if $value is an boolean, and false otherwise.
-     *
-     * @param [type] $value
-     * @return boolean
+     * Get the value of errors
      */
-    public function isBool($value): bool
+    public function getErrors()
     {
-        if (is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE))) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->errors;
     }
 
     /**
-     * Return true if $value is an email, and false otherwise.
+     * Add error message if the value previously set isn't a boolean.
      *
-     * @param string $value
-     * @return boolean
+     * @return self
      */
-    public function isEmail(string $value): bool
+    public function isBool(): self
     {
-        if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            return true;
-        } else {
-            return false;
+        if (!is_bool(filter_var($this->value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE))) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field isn\'t an boolean.';
         }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a alphabetical string.
+     *
+     * @return self
+     */
+    public function isAlpha(): self
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => "/^[a-zA-Z]+$/")))) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field isn\'t an alphabetical string.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a alphanumerical string.
+     *
+     * @return self
+     */
+    public function isAlphanum(): self
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => "/^[a-zA-Z0-9]+$/")))) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field isn\'t an alphanumerical string.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a email adress.
+     *
+     * @return self
+     */
+    public function isEmail(): self
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field isn\'t an email adress.';
+        }
+        return $this;
     }
 
     /**
      * Use a predefined pattern of the class called by the parameter and check if the value is valid. If not, add error message.
      *
-     * @param [type] $name
+     * @param [type] $option
      * @return self
      */
-    public function predefinedPattern($name): self
+    public function predefinedPattern($option): self
     {
-        $regex = '/' . $this->patterns[$name] . '/u';
+        $regex = '/' . $this->patterns[$option] . '/u';
         if ($this->value != '' && !preg_match($regex, $this->value)) {
-            $this->errors[] = 'The ' . $this->name . ' field is invalid.';
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is invalid.';
         }
         return $this;
     }
@@ -126,7 +176,7 @@ class FormValidator
     {
         $regex = '/' . $pattern . '/u';
         if ($this->value != '' && !preg_match($regex, $this->value)) {
-            $this->errors[] = 'The ' . $this->name . ' field is invalid.';
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is invalid.';
         }
         return $this;
     }
@@ -139,7 +189,7 @@ class FormValidator
     public function required(): self
     {
         if ((isset($this->file) && $this->file['error'] == 4) || ($this->value == '' || $this->value == null)) {
-            $this->errors[] = 'The field ' . $this->name . ' is mandatory.';
+            $this->errors[$this->name] = 'The field ' . $this->name . ' is mandatory.';
         }
         return $this;
     }
@@ -155,10 +205,10 @@ class FormValidator
         if (is_string($this->value)) {
 
             if (strlen($this->value) < $length) {
-                $this->errors[] = 'The ' . $this->name . ' field doesn\'t have enough characters.';
+                $this->errors[$this->name] = 'The ' . $this->name . ' field doesn\'t have enough characters.';
             }
         } elseif ($this->value < $length) {
-            $this->errors[] = 'The ' . $this->name . ' value is too small.';
+            $this->errors[$this->name] = 'The ' . $this->name . ' value is too small.';
         }
         return $this;
     }
@@ -174,10 +224,25 @@ class FormValidator
         if (is_string($this->value)) {
 
             if (strlen($this->value) > $length) {
-                $this->errors[] = 'The ' . $this->name . ' field have too many characters.';
+                $this->errors[$this->name] = 'The ' . $this->name . ' field have too many characters.';
             }
         } elseif ($this->value > $length) {
-            $this->errors[] = 'The ' . $this->name . ' value is too big.';
+            $this->errors[$this->name] = 'The ' . $this->name . ' value is too big.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value isn't a number between $min and $max.
+     *
+     * @param integer $min
+     * @param integer $max
+     * @return self
+     */
+    public function betweenInputs(int $min, int $max): self
+    {
+        if ($this->value < $min || $this->value > $max) {
+            $this->errors[$this->name] = "The $this->name field must contain a number between $min and $max.";
         }
         return $this;
     }
@@ -188,10 +253,40 @@ class FormValidator
      * @param [type] $value
      * @return self
      */
-    public function equal($value): self
+    public function matches($value): self
     {
         if ($this->value != $value) {
-            $this->errors[] = "The $this->name field is invalid.";
+            $this->errors[$this->name] = "The $this->name field is invalid.";
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the file size exceeds the size set as parameter. 
+     *
+     * @param [type] $size
+     * @return self
+     */
+    public function fileMaxSize($size): self
+    {
+
+        if ($this->file[$this->name]['error'] != 4 && $this->file[$this->name]['size'] > $size) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' file exceeds the size limit of ' . number_format($size / 1048576, 2) . ' MB.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the file size is smaller than the size set as parameter. 
+     *
+     * @param [type] $size
+     * @return self
+     */
+    public function fileMinSize($size): self
+    {
+
+        if ($this->file[$this->name]['error'] != 4 && $this->file[$this->name]['size'] < $size) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' file must be at least ' . number_format($size / 1048576, 2) . ' MB.';
         }
         return $this;
     }
@@ -204,29 +299,25 @@ class FormValidator
      */
     public function fileExt($ext): self
     {
-        if ($this->file['error'] != 4 && pathinfo($this->file['name'], PATHINFO_EXTENSION) != $ext && strtoupper(pathinfo($this->file['name'], PATHINFO_EXTENSION)) != $ext) {
-            $this->errors[] = 'The ' . $this->name . ' is not a .' . $ext . ' .';
+        if ($this->file[$this->name]['error'] != 4 && pathinfo($this->file[$this->name]['name'], PATHINFO_EXTENSION) != $ext && strtoupper(pathinfo($this->file[$this->name]['name'], PATHINFO_EXTENSION)) != $ext) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' is not a .' . $ext . ' .';
         }
         return $this;
     }
 
     /**
-     * Get the value of errors
+     * Add error message is the file previously set doesn't have the format set as parameter. 
+     *
+     * @param [type] $format
+     * @return self
      */
-    public function getErrors()
+    public function fileFormat($format): self
     {
-        return $this->errors;
+        if ($this->file[$this->name]['error'] != 4 && !mime_content_type($this->file[$this->name]['tmp_name'], $format)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' is not a .' . $format . ' .';
+        }
+        return $this;
     }
 
-    /**
-     * Display all error messages in the html
-     *
-     * @return void
-     */
-    public function displayErrors($tags, $class)
-    {
-        foreach ($this->errors as $error) {
-            echo $error;
-        }
-    }
+    
 }
