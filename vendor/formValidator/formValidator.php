@@ -100,6 +100,20 @@ class FormValidator
     }
 
     /**
+     * This method can be used to quickly display a list of all the errors found at the end of the validation inside the HTML. 
+     */
+    public function displayErrorsList()
+    {
+        $errorList = "<ul>";
+
+        foreach ($this->errors as $error) {
+            $errorList .= "<li>$error</li>";
+        }
+        $errorList .= "</ul>";
+        echo $errorList;
+    }
+
+    /**
      * Add error message if the value previously set isn't a boolean.
      *
      * @return self
@@ -108,6 +122,58 @@ class FormValidator
     {
         if (!is_bool(filter_var($this->value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE))) {
             $this->errors[$this->name] = 'The ' . $this->name . ' field isn\'t an boolean.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't empty.
+     *
+     * @return self
+     */
+    public function isEmpty(): self
+    {
+        if (!empty($this->value)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is not empty.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a float number.
+     *
+     * @return self
+     */
+    public function isFloat(): self
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_FLOAT)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is not a float number.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a integer number.
+     *
+     * @return self
+     */
+    public function isInt(): self
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_INT)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is not a integer number.';
+        }
+        return $this;
+    }
+
+    /**
+     * Add error message if the value previously set isn't a string of characters.
+     *
+     * @return self
+     */
+    public function isString(): self
+    {
+        if (!is_string($this->value)) {
+            $this->errors[$this->name] = 'The ' . $this->name . ' field is not a string of characters.';
         }
         return $this;
     }
@@ -318,6 +384,4 @@ class FormValidator
         }
         return $this;
     }
-
-    
 }

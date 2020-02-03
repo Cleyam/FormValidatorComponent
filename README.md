@@ -77,8 +77,28 @@ This method will return true if the $errors attribute is empty.
 This method will return the $errors attribute as an array. Each key of this array will be the name of the input containing a error, and the values will error messages.
 
 
+* #### displayErrorList
+If you don't want to use the getErrors method to deal with the failures in the validation of your form, you can use this method to quickly display a list of said errors in the HTML. It can be useful for test purpose, but for a proper display of the errors, getErrors should always be prefered.
+
+
 * #### isBool
 This method will add a contextual error message in the $errors array if the set value isn't a boolean.
+
+
+* #### isEmpty
+This method will add a contextual error message in the $errors array if the set value isn't empty.
+
+
+* #### isFloat
+This method will add a contextual error message in the $errors array if the set value isn't a float number.
+
+
+* #### isInt
+This method will add a contextual error message in the $errors array if the set value isn't a integer number.
+
+
+* #### isString
+This method will add a contextual error message in the $errors array if the set value isn't a string.
 
 
 * #### isAlpha
